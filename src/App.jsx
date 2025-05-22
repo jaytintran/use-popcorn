@@ -16,9 +16,8 @@ export default function App() {
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState("");
 	const [query, setQuery] = useState("");
-	const [debouncedQuery, setDebouncedQuery] = useState("");
-
 	const [selectedId, setSelectedId] = useState(null);
+	const [debouncedQuery, setDebouncedQuery] = useState("");
 
 	// useEffect(() => {
 	// 	console.log("After initial render");
@@ -39,13 +38,16 @@ export default function App() {
 		return () => clearTimeout(timer); // ✅ cleanup on next effect call or unmount
 	}, [query]);
 
+	// Fecth movies
 	useEffect(() => {
-		// console.log("After query change");
+		const controller = new AbortController();
+
 		async function fetchMovies() {
 			try {
 				setError("");
 				const res = await fetch(
-					`http://www.omdbapi.com/?apikey=${KEY}&s=${debouncedQuery}`
+					`http://www.omdbapi.com/?apikey=${KEY}&s=${debouncedQuery}`,
+					{ signal: controller.signal }
 				);
 
 				if (!res.ok) {
@@ -60,8 +62,11 @@ export default function App() {
 
 				setMovies(data.Search);
 			} catch (err) {
-				setError(`Movie fetch error: ${err.message}`);
-				setMovies([]);
+				console.log(err.message);
+				if (err.name !== "AbortError") {
+					setError(`Movie fetch error: ${err.message}`);
+					setMovies([]);
+				}
 			} finally {
 				setIsLoading(false);
 			}
@@ -75,10 +80,23 @@ export default function App() {
 
 		fetchMovies();
 
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [debouncedQuery]);
+		return () => {
+			controller.abort();
+		};
+	}, [KEY, debouncedQuery]);
 
-	useEffect(() => {}, [selectedId]);
+	// Listen for escape keypress
+	useEffect(() => {
+		function handleEscapeKey(e) {
+			if (e.code === "Escape") {
+				setSelectedId(null);
+			}
+		}
+		document.addEventListener("keydown", handleEscapeKey);
+		return () => {
+			document.removeEventListener("keydown", handleEscapeKey);
+		};
+	}, [selectedId]);
 
 	// Wrong Way to Fetch
 	// fetch(`http://www.omdbapi.com/?apikey=${KEY}&s=interstellar`)
@@ -87,6 +105,14 @@ export default function App() {
 	// 		setMovies(data.Search);
 	// 		console.log(movies);
 	// 	});
+
+	function handleAddWatchedMovie(movie) {
+		setWatched((watched) => [...watched, movie]);
+	}
+
+	function handleRemoveWatchedMovie(newWatched) {
+		setWatched(newWatched);
+	}
 
 	return (
 		<>
@@ -123,12 +149,20 @@ export default function App() {
 					{selectedId ? (
 						<MovieDetails
 							selectedId={selectedId}
-							onCloseMovie={() => setSelectedId(null)}
+							onCloseMovie={() => {
+								setSelectedId(null);
+							}}
+							onAddWatchedMovie={handleAddWatchedMovie}
+							onRemoveWatchedMovie={handleRemoveWatchedMovie}
+							watched={watched}
 						/>
 					) : (
 						<>
 							<WatchedSummary watched={watched} />
-							<WatchedMovieList watched={watched} />
+							<WatchedMovieList
+								watched={watched}
+								onRemoveWatchedMovie={handleRemoveWatchedMovie}
+							/>
 						</>
 					)}
 				</Box>

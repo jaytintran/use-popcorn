@@ -23,12 +23,12 @@ const WatchedSummary = ({ watched }) => {
 				</p>
 				<p>
 					<span>🌟</span>
-					<span>{avgUserRating}</span>
+					<span>{avgUserRating.toFixed(2)}</span>
 				</p>
 				<p>
 					<span>⏳</span>
 					<span style={{ display: "flex", gap: ".5rem" }}>
-						<span>{avgRuntime}</span>
+						<span>{avgRuntime.toFixed(2)}</span>
 						<span>mins</span>
 					</span>
 				</p>

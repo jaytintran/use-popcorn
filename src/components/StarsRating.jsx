@@ -83,7 +83,7 @@ const StarsRating = ({
 	className = "",
 	messages = ["Excellent", "Good", "Average", "Bad", "Terrible"],
 	defaulRating = 0,
-	onSetRating,
+	onRate,
 }) => {
 	const [rating, setRating] = useState(defaulRating);
 	const [hoverRating, setHoverRating] = useState(0);
@@ -104,8 +104,8 @@ const StarsRating = ({
 	};
 
 	useEffect(() => {
-		onSetRating && onSetRating(rating);
-	}, [rating, onSetRating]);
+		onRate && onRate(rating);
+	}, [rating, onRate]);
 
 	const activeTooltipStyle = {
 		...tooltipStyle,
@@ -155,7 +155,7 @@ StarsRating.propTypes = {
 	className: PropTypes.string,
 	messages: PropTypes.array,
 	defaulRating: PropTypes.number,
-	onSetRating: PropTypes.func,
+	onRate: PropTypes.func,
 };
 
 export default StarsRating;

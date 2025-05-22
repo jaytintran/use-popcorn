@@ -1,8 +1,15 @@
-const WatchMovieItem = ({ movie }) => {
+const WatchMovieItem = ({ movie, onRemoveWatchedMovie, watched }) => {
+	function handleRemoveWatchedMovie() {
+		const newWatchedArray = watched.filter(
+			(watched) => watched.imdbID !== movie.imdbID
+		);
+		onRemoveWatchedMovie(newWatchedArray);
+	}
+
 	return (
 		<li>
-			<img src={movie.Poster} alt={`${movie.Title} poster`} />
-			<h3>{movie.Title}</h3>
+			<img src={movie.poster} alt={`${movie.title} poster`} />
+			<h3>{movie.title}</h3>
 			<div>
 				<p>
 					<span>⭐️</span>
@@ -14,9 +21,12 @@ const WatchMovieItem = ({ movie }) => {
 				</p>
 				<p>
 					<span>⏳</span>
-					<span>{movie.runtime} min</span>
+					<span>{movie.runtime} mins</span>
 				</p>
 			</div>
+			<button onClick={handleRemoveWatchedMovie} className="btn-delete">
+				Remove
+			</button>
 		</li>
 	);
 };
