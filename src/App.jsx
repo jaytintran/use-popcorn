@@ -12,12 +12,16 @@ import MovieDetails from "./components/MovieDetails";
 export default function App() {
 	const KEY = process.env.REACT_APP_OMDB_API_KEY;
 	const [movies, setMovies] = useState([]);
-	const [watched, setWatched] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState("");
 	const [query, setQuery] = useState("");
 	const [selectedId, setSelectedId] = useState(null);
 	const [debouncedQuery, setDebouncedQuery] = useState("");
+
+	// const [watched, setWatched] = useState([]);
+	const [watched, setWatched] = useState(function () {
+		return JSON.parse(localStorage.getItem("watched")) || [];
+	});
 
 	// useEffect(() => {
 	// 	console.log("After initial render");
@@ -108,7 +112,13 @@ export default function App() {
 
 	function handleAddWatchedMovie(movie) {
 		setWatched((watched) => [...watched, movie]);
+
+		// localStorage.setItem("watched", JSON.stringify([...watched, movie]));
 	}
+
+	useEffect(() => {
+		localStorage.setItem("watched", JSON.stringify(watched));
+	}, [watched]);
 
 	function handleRemoveWatchedMovie(newWatched) {
 		setWatched(newWatched);
