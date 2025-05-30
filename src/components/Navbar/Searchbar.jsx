@@ -12,11 +12,18 @@ const SearchBar = ({ query, setQuery }) => {
 	// );
 
 	useEffect(() => {
-		if (inputRef.current) {
-			console.log(inputRef.current);
-			inputRef.current.focus();
+		function callback(e) {
+			if (document.activeElement === inputRef.current) return;
+
+			if (e.code === "Enter") {
+				inputRef.current.focus();
+				setQuery("");
+			}
 		}
-	}, []);
+		document.addEventListener("keydown", callback);
+
+		return () => document.addEventListener("keydown", callback);
+	}, [setQuery]);
 
 	return (
 		<input
