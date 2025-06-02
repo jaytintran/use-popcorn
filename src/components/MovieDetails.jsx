@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import StarsRating from "./StarsRating";
 
 const Loading = () => {
@@ -16,10 +16,17 @@ const MovieDetails = ({
 	onRemoveWatchedMovie,
 	watched = [],
 }) => {
+	const countRef = useRef(0);
+
 	const KEY = process.env.REACT_APP_OMDB_API_KEY;
 	const [movieDetails, setMovieDetails] = useState({});
 	const [userRating, setUserRating] = useState("");
 	const [isLoading, setIsLoading] = useState(true);
+
+	useEffect(() => {
+		// update the count ref when use rates the movie
+		if (userRating) countRef.current = countRef.current + 1;
+	}, [userRating]);
 
 	useEffect(() => {
 		async function fetchMovieDetails() {
@@ -85,6 +92,7 @@ const MovieDetails = ({
 			imdbRating: Number(imdbRating),
 			imdbVotes: Number(imdbVotes.replace(/,/g, "")),
 			imdbID: selectedId,
+			countRatingDecisions: countRef.current,
 		};
 		console.log(newMovie);
 
